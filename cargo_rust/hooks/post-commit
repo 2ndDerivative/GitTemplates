@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+"""This tags new cargo program versions automatically with a vX.X.X-git tag"""
+from subprocess import check_output, run, check_call, DEVNULL, CalledProcessError
+
+def check_cargo_toml_version():
+    result = check_output(['rg', 'version\s?=\s?"(.*)"', 'Cargo.toml', '-r', '$1']).decode("utf-8").strip()
+    return result
+
+print('Checking for version updates...')
+
+new_version = check_cargo_toml_version()
+
+run(['git', 'stash'], stdout=DEVNULL, stderr=DEVNULL)
+run(['git', 'checkout', 'HEAD~1'], stdout=DEVNULL, stderr=DEVNULL)
+old_version = check_cargo_toml_version()
+
+run(['git', 'checkout', '-'], stdout=DEVNULL, stderr=DEVNULL)
+run(['git', 'stash', 'pop'], stdout=DEVNULL, stderr=DEVNULL)
+if new_version is not old_version:
+    print(f"New version found: {new_version}")
+    try:
+        check_call(['git', 'tag', f'v{new_version}'], stdout=DEVNULL, stderr=DEVNULL)
+        print("Added tag!")
+    except CalledProcessError as c:
+        print(f"Failed to add tag.")
+else:
+    print('No new version found')
