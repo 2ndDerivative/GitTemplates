@@ -23,7 +23,7 @@ old_version = check_cargo_toml_version()
 
 run(['git', 'checkout', '-'], stdout=DEVNULL, stderr=DEVNULL)
 run(['git', 'stash', 'pop'], stdout=DEVNULL, stderr=DEVNULL)
-if new_version == old_version:
+if new_version != old_version:
     print(f"New version found: {new_version}")
     try:
         check_call(['git', 'tag', '-a', f'v{new_version}', '-m', '""'], stdout=DEVNULL, stderr=DEVNULL)
