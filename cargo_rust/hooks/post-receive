@@ -1,0 +1,24 @@
+#!/bin/sh
+MAIN_BRANCH="main"
+TARGET="F:/deployment_directory""
+TEMP_DIR="$TEMP/git_hook_test"
+TARGET_FILE="deployed_file.exe"
+GIT_DIR="F:/SoftwareRepositories/deployed_repo.git"
+
+while read oldrev newrev ref
+do
+    if [ "$ref" = "refs/heads/$MAIN_BRANCH" ];
+    then
+        mkdir $TEMP_DIR
+        set -e
+        git --work-tree="$TEMP_DIR" checkout -f $MAIN_BRANCH
+        cd $TEMP_DIR
+        echo "Building new release file..."
+        cargo build --bin display --features=display --release --quiet
+        cp "$TEMP_DIR/target/release/$TARGET_FILE" "$TARGET/$TARGET_FILE" -f
+        echo "$TARGET_FILE deployed."
+        rm -rf $TEMP_DIR
+    else
+        echo "Ref $ref received, doing nothing. Only branch $MAIN_BRANCH is deployed"
+    fi
+done
