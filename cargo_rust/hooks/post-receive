@@ -14,7 +14,7 @@ do
         git --work-tree="$TEMP_DIR" checkout -f $MAIN_BRANCH
         cd $TEMP_DIR
         echo "Building new release file..."
-        cargo build --bin display --features=display --release --quiet
+        cargo build --release --quiet
         cp "$TEMP_DIR/target/release/$TARGET_FILE" "$TARGET/$TARGET_FILE" -f
         echo "$TARGET_FILE deployed."
         rm -rf $TEMP_DIR
